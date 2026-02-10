@@ -35,4 +35,4 @@ La aplicación incluye un sistema automático anti-cache que fuerza la recarga d
 ---
 
 *React + Vite template* 
- 
+ .
