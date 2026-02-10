@@ -2,42 +2,27 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redireccionando...</title>
-    <!-- Meta tags anti-cache extremos -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <meta http-equiv="Vary" content="*">
-    <!-- Forzar recarga completa -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redireccionando...</title>
     <script>
-        // Limpiar todo el caché y redirigir
         (function() {
-            // Timestamp único para forzar recarga
-            var timestamp = new Date().getTime();
-            var targetUrl = './index.html?nocache=' + timestamp + '&v=1770756640224';
-            
-            // Intentar limpiar caché del Service Worker si existe
+            var ts = '1770757183401';
+            var targetUrl = './index.html?fresh=' + ts;
             if ('caches' in window) {
                 caches.keys().then(function(names) {
-                    for (let name of names) {
-                        caches.delete(name);
-                    }
+                    names.forEach(function(name) { caches.delete(name); });
                 });
             }
-            
-            // Redirigir inmediatamente
             window.location.replace(targetUrl);
         })();
     </script>
-    <!-- Redirección HTML por si JavaScript falla -->
-    <meta http-equiv="refresh" content="0; url=./index.html?nocache=1">
+    <meta http-equiv="refresh" content="0; url=./index.html?fresh=1">
 </head>
 <body>
-    <h1>Redireccionando a la aplicación...</h1>
-    <p>Si no se redirige automáticamente, <a id="redirect-link" href="./index.html">haz clic aquí</a>.</p>
-    <script>
-        document.getElementById('redirect-link').href = './index.html?nocache=' + new Date().getTime();
-    </script>
+    <p>Redireccionando...</p>
+    <a href="./index.html?fresh=1770757183401">Haz clic aquí si no se redirige</a>
 </body>
 </html>
