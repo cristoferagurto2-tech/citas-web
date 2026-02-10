@@ -10,19 +10,35 @@ let content = fs.readFileSync(distIndexPath, 'utf8');
 // Generar timestamp único
 const timestamp = Date.now();
 
-// Agregar meta tags anti-cache simples al head
+// Script anti-cache que debe ir PRIMERO en el head
+const antiCacheScript = `
+    <script>
+      // ANTI-CACHE: Redirigir con timestamp si no existe
+      if (!window.location.search.includes('nocache=')) {
+        var url = new URL(window.location.href);
+        url.searchParams.set('nocache', Date.now());
+        window.location.replace(url.toString());
+      }
+    </script>`;
+
+// Insertar el script anti-cache justo después de <head>
+content = content.replace(
+  '<head>',
+  '<head>' + antiCacheScript
+);
+
+// Agregar meta tags anti-cache después del charset
 const antiCacheMeta = `
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">`;
 
-// Insertar meta tags después del charset
 content = content.replace(
   '<meta charset="UTF-8" />',
   '<meta charset="UTF-8" />' + antiCacheMeta
 );
 
-// Agregar versión anti-cache a los assets
+// Agregar versión a los assets
 content = content.replace(
   /src="\/assets\/([^"]+)\.js"/g,
   `src="/assets/$1.js?v=${timestamp}"`
@@ -33,34 +49,33 @@ content = content.replace(
   `href="/assets/$1.css?v=${timestamp}"`
 );
 
-// Guardar index.html actualizado
+// Guardar index.html
 fs.writeFileSync(distIndexPath, content);
 
-// Crear qr.html simple que redirige a index.html
+// Crear qr.html simple con redirección
 const qrContent = `<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=./index.html?v=${timestamp}">
+    <meta http-equiv="refresh" content="0; url=./index.html?nocache=${timestamp}">
     <title>Redireccionando...</title>
+    <script>
+        window.location.replace('./index.html?nocache=${timestamp}');
+    </script>
 </head>
 <body>
-    <p>Redireccionando a la aplicación...</p>
-    <a href="./index.html?v=${timestamp}">Haz clic aquí si no se redirige automáticamente</a>
-    <script>
-        window.location.href = './index.html?v=${timestamp}';
-    </script>
+    <p>Cargando aplicación...</p>
+    <a href="./index.html?nocache=${timestamp}">Haz clic aquí</a>
 </body>
 </html>`;
 
-// Escribir el archivo qr.html en raíz
+// Escribir qr.html
 fs.writeFileSync(qrPath, qrContent);
 
-// Copiar qr.html a la carpeta dist
+// Copiar a dist
 const distQrPath = path.join(process.cwd(), 'dist', 'qr.html');
 fs.writeFileSync(distQrPath, qrContent);
 
-console.log(`✅ QR actualizado con timestamp: ${timestamp}`);
-console.log('✅ Anti-cache headers agregados');
-console.log('✅ qr.html redirige a index.html con versión actualizada');
-console.log('✅ Archivos listos para Cloudflare Pages');
+console.log(`✅ Build actualizado con anti-cache: ${timestamp}`);
+console.log('✅ index.html redirige automáticamente con ?nocache=');
+console.log('✅ qr.html redirige con timestamp único');
