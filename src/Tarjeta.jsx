@@ -5,6 +5,7 @@ function Tarjeta() {
   const [descripcion, setDescripcion] = useState('')
   const [foto, setFoto] = useState(null)
   const [fotoPreview, setFotoPreview] = useState(null)
+  const [procesandoFoto, setProcesandoFoto] = useState(false)
   const fileInputRef = useRef(null)
 
   const datosCosturera = {
@@ -35,6 +36,52 @@ function Tarjeta() {
     setFotoPreview(null)
   }
 
+  const procesarImagenParaWhatsApp = async (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      
+      reader.onload = (event) => {
+        const img = new Image()
+        img.onload = () => {
+          const canvas = document.createElement('canvas')
+          const MAX_WIDTH = 600
+          const MAX_HEIGHT = 800
+          
+          let width = img.width
+          let height = img.height
+          
+          if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+            const ratio = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height)
+            width *= ratio
+            height *= ratio
+          }
+          
+          canvas.width = width
+          canvas.height = height
+          
+          const ctx = canvas.getContext('2d')
+          ctx.fillStyle = '#FFFFFF'
+          ctx.fillRect(0, 0, width, height)
+          ctx.drawImage(img, 0, 0, width, height)
+          
+          const base64 = canvas.toDataURL('image/jpeg', 0.85)
+          
+          if (base64.length > 950) {
+            reject(new Error('La imagen es demasiado grande para WhatsApp'))
+          } else {
+            resolve(base64)
+          }
+        }
+        
+        img.onerror = () => reject(new Error('Error al cargar imagen'))
+        img.src = event.target.result
+      }
+      
+      reader.onerror = () => reject(new Error('Error al leer archivo'))
+      reader.readAsDataURL(file)
+    })
+  }
+
   const handleFotoChange = (e) => {
     const file = e.target.files[0]
     if (file) {
@@ -47,7 +94,7 @@ function Tarjeta() {
     }
   }
 
-  const enviarWhatsApp = () => {
+  const enviarWhatsApp = async () => {
     if (!servicioSeleccionado) return
     
     let mensaje = `Hola Sabina, me interesa el servicio de ${servicioSeleccionado.nombre}`
@@ -56,17 +103,25 @@ function Tarjeta() {
       mensaje += `\n\nDescripción del trabajo:\n${descripcion}`
     }
     
+    if (foto) {
+      setProcesandoFoto(true)
+      try {
+        const base64Image = await procesarImagenParaWhatsApp(foto)
+        if (base64Image) {
+          mensaje += `\n\n[FOTO]\n${base64Image}`
+        }
+      } catch (error) {
+        console.error('Error procesando imagen:', error)
+        alert('La imagen es demasiado grande para WhatsApp. Por favor usa una imagen más pequeña.')
+      } finally {
+        setProcesandoFoto(false)
+      }
+    }
+    
     const mensajeEncoded = encodeURIComponent(mensaje)
     const enlaceWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensajeEncoded}`
     
     window.open(enlaceWhatsApp, '_blank')
-    
-    // Si hay foto, mostrar instrucciones
-    if (foto) {
-      setTimeout(() => {
-        alert('Para enviar la foto, por favor adjúntala manualmente en el chat de WhatsApp que se acaba de abrir.')
-      }, 1000)
-    }
   }
 
   const cerrarFormulario = () => {
@@ -74,6 +129,7 @@ function Tarjeta() {
     setDescripcion('')
     setFoto(null)
     setFotoPreview(null)
+    setProcesandoFoto(false)
   }
 
   return (
@@ -189,10 +245,13 @@ d        </h3>
 
             <button
               onClick={enviarWhatsApp}
-              className="w-full py-3 bg-[#25D366] text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+              disabled={procesandoFoto}
+              className={`w-full py-3 bg-[#25D366] text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 ${
+                procesandoFoto ? 'opacity-70 cursor-not-allowed' : ''
+              }`}
             >
-              <span className="text-[20px]">💬</span>
-              Enviar solicitud por WhatsApp
+              <span className="text-[20px]">{procesandoFoto ? '⏳' : '💬'}</span>
+              {procesandoFoto ? 'Procesando imagen...' : 'Enviar solicitud por WhatsApp'}
             </button>
           </div>
         )}

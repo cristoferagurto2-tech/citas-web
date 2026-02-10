@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Archivos de ayuda locales (no necesarios en GitHub)
+*.bat
+*.backup
+QR_UPDATE.md
+README_QR_FIX.md
+GITHUB_PUBLISH_GUIDE.md
+GUIA_RAPIDA_GITHUB.md

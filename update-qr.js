@@ -33,7 +33,7 @@ content = content.replace(
   `href="/assets/$1.css?v=${timestamp}"`
 );
 
-// Escribir el archivo qr.html actualizado (raíz del proyecto)
+// Escribir el archivo qr.html actualizado
 fs.writeFileSync(qrPath, content);
 
 // También actualizar dist/index.html
