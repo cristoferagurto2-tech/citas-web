@@ -28,6 +28,10 @@ npm run preview  # Vista previa
 
 El deploy es automático al hacer push a master via Cloudflare Pages.
 
+## Sistema Anti-Cache
+
+La aplicación incluye un sistema automático anti-cache que fuerza la recarga de la página sin usar versiones almacenadas en caché.
+
 ---
 
 *React + Vite template* 
