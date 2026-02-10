@@ -6,6 +6,7 @@ function Tarjeta() {
   const [fotoPreview, setFotoPreview] = useState(null)
   const [procesandoFoto, setProcesandoFoto] = useState(false)
   const [plantillaSeleccionada, setPlantillaSeleccionada] = useState(null)
+  const [descripcionImagen, setDescripcionImagen] = useState('')
   const fileInputRef = useRef(null)
 
   const datosCosturera = {
@@ -133,6 +134,7 @@ function Tarjeta() {
     setFoto(null)
     setFotoPreview(null)
     setPlantillaSeleccionada(null)
+    setDescripcionImagen('')
   }
 
   const handlePlantillaClick = (plantilla) => {
@@ -223,6 +225,10 @@ function Tarjeta() {
           // La imagen era muy grande, enviamos mensaje sin imagen pero advertimos
           mensaje += `\n\n📎 (La foto era muy grande para enviar por WhatsApp, por favor adjuntar manualmente)`
         }
+        // Agregar descripción de la imagen si existe
+        if (descripcionImagen.trim()) {
+          mensaje += `\n\n📝 Descripción de la imagen:\n${descripcionImagen}`
+        }
       } catch (error) {
         console.error('Error procesando imagen:', error)
         alert('Error al procesar la imagen. Se enviará el mensaje sin foto.')
@@ -242,6 +248,7 @@ function Tarjeta() {
     setFoto(null)
     setFotoPreview(null)
     setPlantillaSeleccionada(null)
+    setDescripcionImagen('')
     setProcesandoFoto(false)
   }
 
@@ -359,6 +366,7 @@ d        </h3>
                     onClick={() => {
                       setFoto(null)
                       setFotoPreview(null)
+                      setDescripcionImagen('')
                     }}
                     className="absolute top-2 right-2 bg-[#e91e63] text-white rounded-full w-6 h-6 flex items-center justify-center text-[14px] hover:bg-[#c2185b]"
                   >
@@ -366,6 +374,20 @@ d        </h3>
                   </button>
                 </div>
               )}
+            </div>
+
+            {/* Campo para describir la imagen/documento */}
+            <div className="mb-4">
+              <label className="block text-[14px] font-semibold text-[#333] mb-2">
+                Describe el documento o imagen (opcional):
+              </label>
+              <textarea
+                value={descripcionImagen}
+                onChange={(e) => setDescripcionImagen(e.target.value)}
+                placeholder="Ej: Es un pantalón azul que necesita ajustar la cintura..."
+                className="w-full p-3 border-2 border-[#e9ecef] rounded-lg text-[14px] resize-none focus:border-[#e91e63] focus:outline-none"
+                rows="2"
+              />
             </div>
 
             <button
