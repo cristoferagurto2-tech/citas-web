@@ -147,9 +147,9 @@ function Tarjeta() {
         const img = new Image()
         img.onload = () => {
           const canvas = document.createElement('canvas')
-          // Reducimos tamaño máximo para que quepa en WhatsApp
-          const MAX_WIDTH = 400
-          const MAX_HEIGHT = 300
+          // Tamaño muy pequeño para asegurar que quepa en WhatsApp
+          const MAX_WIDTH = 300
+          const MAX_HEIGHT = 200
           
           let width = img.width
           let height = img.height
@@ -168,13 +168,17 @@ function Tarjeta() {
           ctx.fillRect(0, 0, width, height)
           ctx.drawImage(img, 0, 0, width, height)
           
-          // Reducimos calidad a 60% para hacer Base64 más pequeño
-          const base64 = canvas.toDataURL('image/jpeg', 0.6)
+          // Calidad muy baja para reducir tamaño Base64
+          const base64 = canvas.toDataURL('image/jpeg', 0.4)
           
           console.log('Tamaño Base64:', base64.length, 'caracteres')
           
-          if (base64.length > 950) {
-            reject(new Error('La imagen es muy grande. Por favor usa una foto más pequeña (menos de 100KB).'))
+          // WhatsApp tiene límite de ~1024 caracteres por mensaje
+          // Base64 usa ~4/3 más espacio, así que limitamos a 700 caracteres para dejar espacio al mensaje
+          if (base64.length > 700) {
+            // Si es muy grande, devolvemos null pero no rechazamos para permitir enviar sin imagen
+            console.warn('Imagen demasiado grande para WhatsApp, se enviará sin imagen')
+            resolve(null)
           } else {
             resolve(base64)
           }
@@ -215,10 +219,13 @@ function Tarjeta() {
         const base64Image = await procesarImagenParaWhatsApp(foto)
         if (base64Image) {
           mensaje += `\n\n[FOTO]\n${base64Image}`
+        } else {
+          // La imagen era muy grande, enviamos mensaje sin imagen pero advertimos
+          mensaje += `\n\n📎 (La foto era muy grande para enviar por WhatsApp, por favor adjuntar manualmente)`
         }
       } catch (error) {
         console.error('Error procesando imagen:', error)
-        alert('La imagen es demasiado grande para WhatsApp. Por favor usa una imagen más pequeña.')
+        alert('Error al procesar la imagen. Se enviará el mensaje sin foto.')
       } finally {
         setProcesandoFoto(false)
       }
