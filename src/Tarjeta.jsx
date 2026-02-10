@@ -2,16 +2,16 @@ import { useState, useRef } from 'react'
 
 function Tarjeta() {
   const [servicioSeleccionado, setServicioSeleccionado] = useState(null)
-  const [descripcion, setDescripcion] = useState('')
   const [foto, setFoto] = useState(null)
   const [fotoPreview, setFotoPreview] = useState(null)
   const [procesandoFoto, setProcesandoFoto] = useState(false)
+  const [plantillaSeleccionada, setPlantillaSeleccionada] = useState(null)
   const fileInputRef = useRef(null)
 
   const datosCosturera = {
     nombre: "Sabina Saraic",
     eslogan: "Arte en cada costura",
-    telefono: "+52 123 456 7890",
+    telefono: "913 664 993",
     ubicacion: "La Pradera, Mz.A Lt. 24",
     imagen: "/costura.png",
     servicios: [
@@ -26,14 +26,117 @@ function Tarjeta() {
     ]
   }
 
+  const plantillasMensaje = {
+    arreglos: [
+      {
+        id: 1,
+        titulo: "Arreglo general",
+        texto: "Hola, ¿qué tal? 👋\nTengo un vestido/pantalón que necesito arreglar (basta/entalle/cierre)\n¿Podría indicarme si está disponible y cuánto sería el costo aproximado?\nMuchas gracias."
+      },
+      {
+        id: 2,
+        titulo: "Arreglo urgente",
+        texto: "Hola Sabina, buenas 👋\nNecesito arreglar urgentemente una prenda.\nEs para un evento importante este fin de semana.\n¿Podrías atenderme pronto?\nGracias."
+      }
+    ],
+    confecciones: [
+      {
+        id: 1,
+        titulo: "Confección nueva",
+        texto: "Hola, ¿cómo estás? 😊\nMe gustaría hacerte una prenda a medida.\nTengo una idea de diseño y necesito saber precios y tiempo de entrega.\n¿Podemos conversar?"
+      },
+      {
+        id: 2,
+        titulo: "Confección con diseño",
+        texto: "Hola Sabina 👋\nQuiero confeccionar un vestido/pantalón y tengo el patrón/lista de medidas.\n¿Cuánto me cobrarías y en cuánto tiempo lo tendrías listo?\nSaludos."
+      }
+    ],
+    costuras: [
+      {
+        id: 1,
+        titulo: "Costura básica",
+        texto: "Hola Sabina 🧵\nTengo una prenda que necesita unas costuras simples.\nNada muy complicado, solo unos retoques.\n¿Me podrías dar una cotización?\nGracias."
+      },
+      {
+        id: 2,
+        titulo: "Costura de refuerzo",
+        texto: "Buenas 👋\nNecesito hacer refuerzos en algunas costuras de mi ropa.\nSe está deshilachando y quiero que dure más.\n¿Cuánto me costaría?"
+      }
+    ],
+    reparacion: [
+      {
+        id: 1,
+        titulo: "Reparación de rasgón",
+        texto: "Hola 👋\nSe me rasgó una prenda y necesito repararla.\nEs un corte en la tela que necesita un buen arreglo.\n¿Podrías ayudarme y decirme el precio?\nGracias."
+      },
+      {
+        id: 2,
+        titulo: "Reparación de cremallera",
+        texto: "Hola Sabina 😊\nLa cremallera/cierre de mi chaqueta/pantalón se dañó.\n¿La puedes reparar o necesito cambiarla toda?\n¿Cuál sería el costo?"
+      }
+    ],
+    ajustes: [
+      {
+        id: 1,
+        titulo: "Ajuste de talla",
+        texto: "Hola, ¿qué tal? 👗\nCompré un vestido/pantalón que me queda grande.\nNecesito ajustarlo a mi talla.\n¿Podrías decirme el costo y tiempo de entrega?\nGracias."
+      },
+      {
+        id: 2,
+        titulo: "Ajuste de largo",
+        texto: "Hola Sabina 👋\nTengo un pantalón/falda que está muy largo.\nNecesito ajustar el largo a mi estatura.\n¿Cuánto me cobrarías por hacer la basta?"
+      }
+    ],
+    bordados: [
+      {
+        id: 1,
+        titulo: "Bordado simple",
+        texto: "Hola 🎨\nMe gustaría hacer un bordado en una prenda.\nEs un diseño sencillo que quiero personalizar.\n¿Podrías darme precios y opciones?\nGracias."
+      },
+      {
+        id: 2,
+        titulo: "Bordado personalizado",
+        texto: "Hola Sabina ✨\nQuiero hacer un bordado personalizado con un nombre/diseño específico.\n¿Trabajas con pedidos personalizados?\n¿Cuál sería el costo aproximado?"
+      }
+    ],
+    modificaciones: [
+      {
+        id: 1,
+        titulo: "Transformación de prenda",
+        texto: "Hola 👋\nTengo una prenda que me gustaría transformar/modificar.\nQuiero cambiar el estilo o añadir/quitar algo.\n¿Podrías asesorarme y darme un presupuesto?"
+      },
+      {
+        id: 2,
+        titulo: "Modificación creativa",
+        texto: "Hola Sabina 💡\nTengo una idea para modificar una prenda que ya no uso.\nQuiero darle una segunda vida con unos cambios.\n¿Podrías ayudarme con esto? ¿Cuánto costaría?"
+      }
+    ],
+    patrones: [
+      {
+        id: 1,
+        titulo: "Diseño de patrón",
+        texto: "Hola 👋\nNecesito que me diseñes un patrón para una prenda.\nTengo una idea clara de lo que quiero pero necesito el patrón para hacerlo.\n¿Podrías ayudarme? ¿Cuál es tu tarifa?"
+      },
+      {
+        id: 2,
+        titulo: "Patrón a medida",
+        texto: "Hola Sabina 📏\nQuiero hacer una prenda a medida y necesito el patrón personalizado según mis medidas exactas.\n¿Trabajas patrones a medida? ¿Cuánto cuesta?"
+      }
+    ]
+  }
+
   const numeroWhatsApp = datosCosturera.telefono.replace(/\D/g, '')
   const enlaceMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(datosCosturera.ubicacion)}`
 
   const handleServicioClick = (servicio) => {
     setServicioSeleccionado(servicio)
-    setDescripcion('')
     setFoto(null)
     setFotoPreview(null)
+    setPlantillaSeleccionada(null)
+  }
+
+  const handlePlantillaClick = (plantilla) => {
+    setPlantillaSeleccionada(plantilla)
   }
 
   const procesarImagenParaWhatsApp = async (file) => {
@@ -97,11 +200,10 @@ function Tarjeta() {
   const enviarWhatsApp = async () => {
     if (!servicioSeleccionado) return
     
-    let mensaje = `Hola Sabina, me interesa el servicio de ${servicioSeleccionado.nombre}`
-    
-    if (descripcion.trim()) {
-      mensaje += `\n\nDescripción del trabajo:\n${descripcion}`
-    }
+    // Usar mensaje de plantilla si está seleccionada, sino mensaje por defecto
+    let mensaje = plantillaSeleccionada 
+      ? plantillaSeleccionada.texto 
+      : `Hola Sabina, me interesa el servicio de ${servicioSeleccionado.nombre}`
     
     if (foto) {
       setProcesandoFoto(true)
@@ -126,9 +228,9 @@ function Tarjeta() {
 
   const cerrarFormulario = () => {
     setServicioSeleccionado(null)
-    setDescripcion('')
     setFoto(null)
     setFotoPreview(null)
+    setPlantillaSeleccionada(null)
     setProcesandoFoto(false)
   }
 
@@ -191,18 +293,30 @@ d        </h3>
               </button>
             </div>
 
-            <div className="mb-4">
-              <label className="block text-[14px] font-semibold text-[#333] mb-2">
-                Describe el trabajo que necesitas:
-              </label>
-              <textarea
-                value={descripcion}
-                onChange={(e) => setDescripcion(e.target.value)}
-                placeholder="Ej: Tengo un vestido que necesita ajustar la cintura y el largo..."
-                className="w-full p-3 border-2 border-[#e9ecef] rounded-lg text-[14px] resize-none focus:border-[#e91e63] focus:outline-none"
-                rows="3"
-              />
-            </div>
+            {/* Plantillas de mensajes específicas del servicio */}
+            {plantillasMensaje[servicioSeleccionado.id] && (
+              <div className="mb-4">
+                <label className="block text-[14px] font-semibold text-[#333] mb-2">
+                  Selecciona un mensaje para {servicioSeleccionado.nombre}:
+                </label>
+                <div className="grid grid-cols-1 gap-2">
+                  {plantillasMensaje[servicioSeleccionado.id].map((plantilla) => (
+                    <button
+                      key={plantilla.id}
+                      onClick={() => handlePlantillaClick(plantilla)}
+                      className={`p-3 rounded-lg border-2 text-left text-[13px] transition-all ${
+                        plantillaSeleccionada?.id === plantilla.id
+                          ? 'bg-[#e91e63] text-white border-[#e91e63]'
+                          : 'bg-white border-[#e9ecef] hover:border-[#e91e63] text-[#333]'
+                      }`}
+                    >
+                      <span className="font-bold block mb-1">{plantilla.titulo}</span>
+                      <span className="opacity-90 text-[12px] line-clamp-2">{plantilla.texto.substring(0, 60)}...</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="mb-4">
               <label className="block text-[14px] font-semibold text-[#333] mb-2">
